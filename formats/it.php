@@ -32,7 +32,6 @@ class chiptag_format_it extends chiptag_format	{
 		}
 		$this->title = substr($head,4,26);
 
-		$this->ReportHelp();
 
 		return $this->report;
 	}

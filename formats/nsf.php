@@ -25,7 +25,24 @@ class chiptag_format_nsf extends chiptag_format	{
 	function __construct($file)	{
 		$this->file = $file;
 		$this->format_token = 'NESM'.chr(26);
-		$this->report = array('file : '.$file);
+		$this->report = array('FILE : '.$file);
+		$this->tag_scheme = array(
+			'artist'	=>	array(
+						'position'	=>	46,
+						'length'		=>	32,
+						'delimiter'	=> chr(0),
+			),
+			'title'	=>	array(	
+						'position'	=> 14,
+						'length'		=> 32,
+						'delimiter'	=>	chr(0),
+			),
+			'copy'	=>	array(
+						'position'	=>	78,
+						'length'	=>	32,
+						'delimiter' => chr(0),
+			),
+		);
 	}
 
 	function FetchInfo()	{
@@ -40,7 +57,7 @@ class chiptag_format_nsf extends chiptag_format	{
 		$this->title = substr($head,14,32);
 		$this->copy = substr($head,78,32);
 
-		$this->ReportHelp();
+		$this->ReadTags();
 
 		$no_songs = ord(substr($head,6,1));
 		if ($no_songs>1)	{
@@ -75,6 +92,7 @@ class chiptag_format_nsf extends chiptag_format	{
 
 		return $this->report;
 	}
+
 
 }
 

@@ -10,11 +10,13 @@
 **********************************************************/
 
 
+// Load all format classes in subdirectory.
 foreach (glob(dirname(__FILE__).'/formats/*.php') as $file)	{
 	include($file);
 }
 
 
+// Main interface class, returns appropriate object.
 
 class chiptag	{
 
@@ -31,8 +33,7 @@ class chiptag	{
 			return new $class($file);
 		}
 		else return new chiptag_format($error);
-	}
-  
+	}  
 }
 
 
@@ -42,19 +43,63 @@ class chiptag_format	{
 
 	function __construct($errorText)	{
 		$this->report = array($errorText);
+		$this->tag_scheme = array();
+		$this->tags = array();
+		$this->info_scheme = array();
+		$this->infos = array();
 	}
-	
+
+
 	function FetchInfo()	{
 		return $this->report;
 	}
+	
 
-	function ReportHelp()	{
-		$posse = array('artist','title','copy');
-		foreach ($posse as $tag)	{
-			if (trim($this->$tag)!='')	{
-				$this->report[] = $tag.' : '.$this->$tag;
+	function ReadTags()	{
+		if (!is_file($this->file))	{
+			$this->report[] = 'Can not find file to read tags.';
+			return false;
+		}
+		$f = fopen($this->file,'r');
+		$this->report[] = 'Reading tags . . .';
+		foreach ((array)$this->tag_scheme as $tag => $tag_scheme)	{
+			fseek($f,$tag_scheme['position']);
+			$this->tags[$tag] = trim(fread($f,$tag_scheme['length']));	
+			if ($this->tags[$tag]!='')	{
+				$this->report[] = $tag.' : '.$this->tags[$tag];
 			}
 		}
+		$this->report[] = '. . . done reading tags.';
+		fclose($f);
+		return true;
+	}
+
+
+	function SetTag($tag,$val)	{
+		if (array_key_exists($tag,$this->tag_scheme))	{
+			$this->tags[$tag] = $val;
+			$this->report[] = 'Tag `'.$tag.'` set to `'.$val.'`.';
+			return true;
+		}
+		else	{
+			$this->report[] = 'Can not set `'.$tag.'` tag.';
+			return false;
+		}
+	}
+
+
+	function WriteTags()	{
+		$f = fopen($this->file,'r+');
+		foreach ((array)$this->tag_scheme as $tag => $tag_scheme)	{
+			if (strlen($tag_scheme['delimiter'])>0 && $tag_scheme['length'])	{
+				$tag = str_pad($this->tags[$tag],$tag_scheme['length'],$tag_scheme['delimiter']);
+			}
+			if ($tag_scheme['position'])	{
+				fseek($f,$tag_scheme['position']);
+				fwrite($f,$tag,$tag_scheme['length']);
+			}
+		}
+		fclose($f);
 	}
 
 }
