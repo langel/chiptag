@@ -64,7 +64,28 @@ class chiptag_format	{
 		$this->report[] = 'Reading tags . . .';
 		foreach ((array)$this->tag_scheme as $tag => $tag_scheme)	{
 			fseek($f,$tag_scheme['position']);
-			$this->tags[$tag] = trim(fread($f,$tag_scheme['length']));	
+			$this->tags[$tag] = fread($f,$tag_scheme['length']);
+			if (isset($tag_scheme['delimiter']))	{
+				$this->tags[$tag] = substr($this->tags[$tag],0,strpos($this->tags[$tag],$tag_scheme['delimiter']));
+			}
+			if ($tag_scheme['ord'])	{
+				$this->tags[$tag] = ord($this->tags[$tag]);
+			}
+			if (isset($tag_scheme['lookup']))	{
+				if ($tag_scheme['bitwise'])	{
+					$temp = array();
+					foreach($this->lookups[$tag_scheme['lookup']] as $key => $val)	{
+						if ($this->tags[$tag]&chiptag_format::$bitnums[$key])	{
+							$temp[] = $this->lookups[$key];
+						}
+					}
+					$this->tags[$tag] = implode('/',$temp);
+				}
+				else	{
+					$this->tags[$tag] = $this->lookups[$tag_scheme['lookup']][$this->tags[$tag]];
+				}
+			}
+			// write tag info to report
 			if ($this->tags[$tag]!='')	{
 				$this->report[] = $tag.' : '.$this->tags[$tag];
 			}
@@ -91,12 +112,14 @@ class chiptag_format	{
 	function WriteTags()	{
 		$f = fopen($this->file,'r+');
 		foreach ((array)$this->tag_scheme as $tag => $tag_scheme)	{
-			if (strlen($tag_scheme['delimiter'])>0 && $tag_scheme['length'])	{
-				$tag = str_pad($this->tags[$tag],$tag_scheme['length'],$tag_scheme['delimiter']);
-			}
-			if ($tag_scheme['position'])	{
-				fseek($f,$tag_scheme['position']);
-				fwrite($f,$tag,$tag_scheme['length']);
+			if ($tag_scheme['write']===true)	{
+				if (strlen($tag_scheme['delimiter'])>0 && $tag_scheme['length'])	{
+					$tag = str_pad($this->tags[$tag],$tag_scheme['length'],$tag_scheme['delimiter']);
+				}
+				if ($tag_scheme['position'])	{
+					fseek($f,$tag_scheme['position']);
+					fwrite($f,$tag,$tag_scheme['length']);
+				}
 			}
 		}
 		fclose($f);
