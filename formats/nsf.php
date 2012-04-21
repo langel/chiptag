@@ -16,8 +16,11 @@ class chiptag_format_nsf extends chiptag_format	{
 
 	function __construct($file)	{
 		$this->file = $file;
-		$this->format_token = 'NESM'.chr(26);
-		$this->report = array('FILE : '.$file);
+		$this->report = array('NSF object instantiated.');
+		$this->identifier = array(
+			'token'		=>	'NESM'.chr(26),
+			'position'	=>	0,
+		);
 		
 		$this->tag_scheme = array(
 			'artist'	=>	array(
@@ -80,24 +83,6 @@ class chiptag_format_nsf extends chiptag_format	{
 			),
 		);
 	}
-
-	function FetchInfo()	{
-		$f = fopen($this->file,'r');
-		$head = fread($f,128);
-		fclose($f);
-		$format_token = substr($head,0,5);
-		if ($format_token!=$this->format_token)	{
-			$this->report[] = 'format token invalid';
-		}
-		$this->artist = substr($head,46,32);
-		$this->title = substr($head,14,32);
-		$this->copy = substr($head,78,32);
-
-		$this->ReadTags();
-
-		return $this->report;
-	}
-
 
 }
 

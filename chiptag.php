@@ -45,27 +45,38 @@ class chiptag_format	{
 		$this->report = array($errorText);
 		$this->tag_scheme = array();
 		$this->tags = array();
-		$this->info_scheme = array();
-		$this->infos = array();
 	}
 
 
-	function FetchInfo()	{
-		return $this->report;
+	function ReadableReport()	{
+		return implode('<br>',$this->report);
 	}
 	
 
-	function ReadTags()	{
+	function FetchInfo()	{
+		$this->report[] = 'reading file '.$this->file;
 		if (!is_file($this->file))	{
 			$this->report[] = 'Can not find file to read tags.';
 			return false;
 		}
 		$f = fopen($this->file,'r');
-		$this->report[] = 'Reading tags . . .';
+		if ($this->identifier['token']!='')	{
+			if ($this->identifier['position'])	{
+				fseek($f,$this->identifier['position']);
+			}
+			$token = fread($f,strlen($this->identifier['token']));
+			if ($token==$this->identifier['token'])	{
+				$this->report[] = "'$token' identifier token found";
+			}
+			else	{
+				$this->report[] = "'$token' identifier token not found?!!?  D:";
+			}
+		}
+		$this->report[] = 'fetching infos . . .';
 		foreach ((array)$this->tag_scheme as $tag => $tag_scheme)	{
 			fseek($f,$tag_scheme['position']);
 			$this->tags[$tag] = fread($f,$tag_scheme['length']);
-			if (isset($tag_scheme['delimiter']))	{
+			if (isset($tag_scheme['delimiter'])&&strpos($this->tags[$tag],$tag_scheme['delimiter']))	{
 				$this->tags[$tag] = substr($this->tags[$tag],0,strpos($this->tags[$tag],$tag_scheme['delimiter']));
 			}
 			if ($tag_scheme['ord'])	{
@@ -76,7 +87,7 @@ class chiptag_format	{
 					$temp = array();
 					foreach($this->lookups[$tag_scheme['lookup']] as $key => $val)	{
 						if ($this->tags[$tag]&chiptag_format::$bitnums[$key])	{
-							$temp[] = $this->lookups[$key];
+							$temp[] = $this->lookups[$tag_scheme['lookup']][$key];
 						}
 					}
 					$this->tags[$tag] = implode('/',$temp);
@@ -90,20 +101,23 @@ class chiptag_format	{
 				$this->report[] = $tag.' : '.$this->tags[$tag];
 			}
 		}
-		$this->report[] = '. . . done reading tags.';
+		$this->report[] = '. . . done fetching infos';
 		fclose($f);
 		return true;
 	}
 
 
 	function SetTag($tag,$val)	{
-		if (array_key_exists($tag,$this->tag_scheme))	{
+		if ($this->tag_scheme[$tag]['write']===true)	{
+			if (strlen($val)>$this->tag_scheme[$tag]['length'])	{
+				$val = substr($val,$this->tag_scheme[$tag]['length']);
+			}
 			$this->tags[$tag] = $val;
-			$this->report[] = 'Tag `'.$tag.'` set to `'.$val.'`.';
+			$this->report[] = 'tag `'.$tag.'` set to `'.$val.'`';
 			return true;
 		}
 		else	{
-			$this->report[] = 'Can not set `'.$tag.'` tag.';
+			$this->report[] = '!can not set `'.$tag.'` tag.';
 			return false;
 		}
 	}
