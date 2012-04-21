@@ -1,1 +1,26 @@
 This is a PHP library for reading information from a variety of chip music file formats.  It also handles tag management.
+
+To utilize this amazing fiasco ---
+
+<?php
+
+include('chiptag.php');
+
+$chiptune = chiptag::open($chiptune_filename);
+
+// chiptag guesses the format from the file's extension
+// chiptag then creates an object from the appropriate class
+
+$chiptune->FetchInfo(); // loads tags and other info
+
+$chiptune->SetTag($tag_name,$value); // duh?
+
+$chiptune->WriteTags(); // commit set tags to the file
+
+echo $chiptune->ReadableReport(); // view history log
+
+?>
+
+
+Look inside the formats folder for info and examples on
+adding more chiptune formats to this library.

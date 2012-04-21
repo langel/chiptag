@@ -1,0 +1,30 @@
+
+	
+	The format classes themselves hold a simple map to
+	information and tags in a chiptune's file header.
+	This map is in the form of an array!  zOMG!!
+
+	Please look at current working formats for examples
+	and/or templates to work from.
+
+	Below is an explanation for the various variables
+	that affect how a tag or info is read or written.
+
+
+	TAG SCHEMES
+
+	Lots of options!  Let's go over some!  :P
+
+	"position" : starting location of tag
+
+	"length" : tag's number of characters
+
+	"delimiter" : some strings are null terminated
+
+	"write" : set to true for writable tags
+
+	"ord" : tag value = the ascii character code
+
+	"lookup" : provide an array to fetch values
+
+	"bitwise" : bit switches == multiple values
