@@ -16,7 +16,7 @@ class chiptag_format_nsf extends chiptag_format	{
 
 	function __construct($file)	{
 		$this->file = $file;
-		$this->report = array('NSF object instantiated.');
+		$this->report = array('NSF object instantiated');
 		$this->identifier = array(
 			'token'		=>	'NESM'.chr(26),
 			'position'	=>	0,

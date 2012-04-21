@@ -6,34 +6,51 @@
 	extension for CHIPTAG
 
 	worked from the Schism Tracker spec --
-	not sure where I got it;
-	...it's basically the same as Jeffrey Lim's version
+	http://schismtracker.org/wiki/ITTECH.TXT
 
 **********************************************************/
 
 
 class chiptag_format_it extends chiptag_format	{
 
-	static	$format_token = 'IMPM';
 
 	function __construct($file)	{
 		$this->file = $file;
-		$this->report = array('file : '.$file);
+		$this->report = array('IT object instantiated');
+		$this->identifier = array(
+			'token'		=>	'IMPM',
+			'position'	=>	0,
+		);
+
+		$this->tag_scheme = array(
+			'title'		=>	array(
+				'position'	=>	4,
+				'length'	=>	26,
+				'delimiter'	=>	chr(0),
+				'write'		=>	true,
+			),
+			'order count'	=>	array(
+				'position'	=>	32,
+				'length'	=>	1,
+				'ord'		=>	true,
+			),
+			'instrument count'	=>	array(
+				'position'	=>	33,
+				'length'	=>	1,
+				'ord'		=>	true,
+			),
+			'sample count'	=>	array(
+				'position'	=>	34,
+				'length'	=>	1,
+				'ord'		=>	true,
+			),
+			'pattern count'	=>	array(
+				'position'	=>	35,
+				'length'	=>	1,
+				'ord'		=>	true,
+			),
+		);
 	}
 
-	function FetchInfo()	{
-		$f = fopen($this->file,'r');
-		$head = fread($f,192);
-		fclose($f);
-
-		$format_token = substr($head,0,4);
-		if($format_token!=chiptag_format_it::$format_token)	{
-			$this->report[] = 'format token invalid';
-		}
-		$this->title = substr($head,4,26);
-
-
-		return $this->report;
-	}
 
 }
