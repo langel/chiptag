@@ -101,6 +101,9 @@ class chiptag_format	{
 				$this->report[] = $tag.' : '.$this->tags[$tag];
 			}
 		}
+		if (method_exists($this,'FetchInfoExtender'))	{
+			$this->FetchInfoExtender($f);
+		}
 		$this->report[] = '. . . done fetching infos';
 		fclose($f);
 		return true;
@@ -135,6 +138,9 @@ class chiptag_format	{
 					fwrite($f,$tag,$tag_scheme['length']);
 				}
 			}
+		}
+		if (method_exists($this,'WriteTagsExtender'))	{
+			$this->WriteTagsExtender($f);
 		}
 		fclose($f);
 	}

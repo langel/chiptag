@@ -28,3 +28,19 @@
 	"lookup" : provide an array to fetch values
 
 	"bitwise" : bit switches == multiple values
+
+
+	...and if that isn't crafty enough for you, there
+	are class method hooks to work with!
+
+	function FetchInfoExtender($file)	{
+	}
+
+	function WriteTagsExtender($file)	{
+	}
+
+	These two methods can be added to a chiptune's
+	format class.  This allows for much more
+	complicated inferation and declarations of
+	chiptune infos.  Also, make sure to --
+	$this->report[] = 'adding junk to the log';
