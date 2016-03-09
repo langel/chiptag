@@ -74,8 +74,8 @@ class chiptag_format_nsf extends chiptag_format	{
 				'PAL/NTSC',
 			),
 			'extra_sound' =>	array(
-				'VRCVI',
-				'VRCVII',
+				'VRC6',
+				'VRC7',
 				'FDS Sound',
 				'MMC5 audio',
 				'Namco 106',

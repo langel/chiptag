@@ -20,7 +20,7 @@ foreach (glob(dirname(__FILE__).'/formats/*.php') as $file)	{
 
 class chiptag	{
 
-	function open($file)	{
+	static function open($file)	{
 		if (!is_file($file))	{
 			$error = $file.' - file unfound. ';
 		}
